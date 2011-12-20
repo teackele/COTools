@@ -4,6 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="/Users/tsoepboer/Documents/eclipsews/Processing/libraries/core.jar" sourcepath="/Users/tsoepboer/Documents/eclipsews/Processing/src/core"/>
 	<classpathentry kind="lib" path="libraries/jackson-all-1.9.2.jar"/>
-	<classpathentry kind="lib" path="/Processing/libraries/modes/java/libraries/net/library/net.jar"/>
+	<classpathentry kind="lib" path="libraries/gson-2.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

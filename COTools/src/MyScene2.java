@@ -9,11 +9,12 @@ public class MyScene2 extends COScene {
 	  public void draw() {
 		    stroke(255);
 		    if (mousePressed) {
-		      line(mouseX,mouseY,pmouseX,pmouseY);
-		    }
+		    	 this.finished = true;
+		    }	
+		    
 	  }
 	
-	  public void mouseClicked() {
+	  public void mousePressed() {
 		  this.finished = true;
 		  
 	}

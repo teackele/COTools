@@ -1,85 +1,40 @@
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-
-import processing.core.PApplet;
 /*
  * Misschien stage manager ertussen voor het beheer van de scenes?
  * 
  */
 public class CODirector extends  COBase {
 	 
+	// net stuff
 	COCmdServer _cmdServer;
-	protected ArrayList<String>  _scenes;
-	volatile protected COScene currentScene;
+	
+	// scene management stuff
+	protected COStageManager stageManager;
+
+	// process controll
+	
 	volatile boolean klaar = false;
 	volatile String status;
-	
 	Object eventMonitor = new Object();
 	boolean gotEvent = false;
-//	Thread thread;
+	//	Thread thread;
 	
 	
 	/*************** Object glue *******************/
 	CODirector() { 	
 		System.out.println("con");
+		this.stageManager = new COStageManager();
 		this._cmdServer = new COCmdServer(this,6789);
-		this._scenes = new ArrayList<String>();
 		
 		//this.thread = new Thread(this);
 	}
 	
 	public void dispose() {
 		this._cmdServer.dispose();
+		this.stageManager.dispose();
 	}
 	
-	/*************** Scene management *******************/
-
-	public void addScene(String newScene) {
-		this._scenes.add(newScene);
-		
-	}
-	
-	// get called from animation thread
-	public void sceneCallback() {
-		// set finished to true to stop applet
-		//System.out.println(Thread.currentThread());
-		//System.out.println("cb");
-	}
-	
-	public synchronized void sceneStop() {
-		this.currentScene.finished = true;
-	}
-	
-	void startVoorstelling() {
-//		PApplet.main(new String[] { "--present", this._scenes[0] });
-		
-		String name = this._scenes.get(0);
-	    
-		// final Scene applet;
-		try {
-			Class<?> c = Thread.currentThread().getContextClassLoader().loadClass(name);
-			this.currentScene = (COScene) c.newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-	    }
-		
-		this.currentScene._director = this;
-		
-	      
-//		PApplet.main(new String[] { "--present",applet);
-		PApplet.runSketch(new String [] {"--present"}, this.currentScene);
-		System.out.println(Thread.currentThread());
-		
-		while (!this.currentScene.finished) {
-//			this.sleep();
-		}
-		
-		this.currentScene.dispose();
-		//System.exit(0);
-		// hier wachten tot skectch klaar is?
-		
-	}
 
 	/**************** Thread and process management *******************/
 	/*
@@ -93,49 +48,36 @@ public class CODirector extends  COBase {
 	*/
 	
 	public void stop() {
-		
+		dispose();
 		System.exit(0);
 	}
 	
 	public void run() {
+		this.stageManager.addScene("MyScene");
+		this.stageManager.addScene("MyScene2");
+		
 		this.status = "Wachten";
 		
 		while(!klaar) {
-		    synchronized(this.eventMonitor){
-		        while(!this.gotEvent){
-		          try{
-		        	 eventMonitor.wait();
-		           } catch(InterruptedException e){}
-		        }
-		        // handle stuff
-		        
-		        
-		        //clear signal and continue running.
-		        this.gotEvent = false;
-		      }
-		    /*
+			
+			if (!this.stageManager.playing) {
+				this.stageManager.cueNextScene();
+			}
+		    
 		    try {
-				Thread.sleep(10);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			*/
 		}
+		
+		// stop niet nodig, gaat terug naar main van waaruit ie is aangeroepen
+		// stop();
 		
 		
 	}
 
-	public void wakeup() {
-		synchronized(this.eventMonitor){
-			this.gotEvent = true;
-			eventMonitor.notify();
-	    }
-	}
-	
-	
-	
-	
 	
 	/*************** Net interface  *******************/
 	public void serverEvent (COCmdServer someServer, COCmdClient someClient) {
@@ -178,13 +120,11 @@ public class CODirector extends  COBase {
 		  Method cmdMethod;
 		  try {
 			  cmdMethod = this.getClass().getMethod("netCommand" + cmd, String[].class,  COCmdClient.class);
-			  this.wakeup();
 			  cmdMethod.invoke(this,  (Object) tokens, (Object) aclient);
 		  }
 		  catch(Exception e) {
 			  // invalid command
-			  aclient.write("Ongeldig commando");
-			  aclient.write(10);
+			  aclient.write("Ongeldig commando\n");
 		  }
 		  // find class method
 
@@ -197,14 +137,33 @@ public class CODirector extends  COBase {
 	  public void netCommandstop(String payload[], COCmdClient aclient) {
 		  log("stop");
 		  //aclient.stop();
-		  System.exit(0);
+		  //System.exit(0);
+		  aclient.write("stopping\n");
+		  this.klaar = true;
+		  //this.wakeup();
 	  }
+
+	  public void netCommandstopscene(String payload[], COCmdClient aclient) {
+		  log("stopscene");
+		  //aclient.stop();
+		  //System.exit(0);
+		  //aclient.write("stopping\n");
+		  this.stageManager.stopScene();
+		  aclient.write("stopped\n");
+		  
+	  }
+
 	  public void netCommandstatus(String payload[], COCmdClient aclient) {
 		  log("status");
-		  aclient.write(this.status);
-		  aclient.write(10);
+		  aclient.write(this.status + "\n");
 		  //aclient.stop();
 	  }
 
+	  public void netCommandnext(String payload[], COCmdClient aclient) {
+		  log("next");
+		  this.stageManager.cueNextScene();
+		  aclient.write(this.status + "\n");
+		  //aclient.stop();
+	  }
 	
 }

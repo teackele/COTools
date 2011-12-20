@@ -6,10 +6,26 @@ import processing.core.*;
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	protected CODirector _director;
+	protected COStageManager stageManager;
+	public long maxRunTime = 0;
+
+	/*
+	 * 
+	 * String with key values automatically fetched if we have a sessionId
+	 */
+	public String[] dataNeeded = {"a","b"};
+	
+	/*
+	 * resource needed
+	 */
+	public String[] resourcesNeeded = {};
 
 	public void handleDraw() {
-		this._director.sceneCallback();
+		try {
+			this.stageManager.sceneCallback();
+			
+		} catch (Exception E) {};
+		
 		super.handleDraw();
 	}
 

@@ -11,12 +11,13 @@ public class Zuil {
 
 		// do config
 
+        // cODirector.addScene("MyScene");
 		cODirector.run();
 		
-		System.out.println("ready?"); 
+		System.out.println("ready!"); 
 		
 		
-		//System.exit(0);
+		System.exit(0);
         
         
         
