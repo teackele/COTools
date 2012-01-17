@@ -1,3 +1,4 @@
+package COTools;
 
 import java.lang.reflect.Method;
 /*
@@ -22,7 +23,7 @@ public class CODirector extends  COBase {
 	
 	
 	/*************** Object glue *******************/
-	CODirector() { 	
+	public CODirector() { 	
 		System.out.println("con");
 		this.stageManager = new COStageManager();
 		this._cmdServer = new COCmdServer(this,6789);

@@ -1,3 +1,5 @@
+import COTools.COScene;
+
 
 public class MyScene2 extends COScene {
 

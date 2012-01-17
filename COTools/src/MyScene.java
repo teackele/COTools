@@ -1,3 +1,6 @@
+import COTools.COScene;
+
+import oklaGeneral.*;
 
 public class MyScene extends COScene {
 
@@ -6,6 +9,9 @@ public class MyScene extends COScene {
 	    size(200,200);
 	    // Initialize all "stripes"
 	    this.maxRunTime = 1000;
+//	    OklaAudioPlayer x = (OklaAudioPlayer) components.get("oklaAudio");
+	    oklaAudio.play("data/audio/telefoonbel16b.wav", "fiets");
+	    oklaTTS.speak("Teackele");
 	  }
 
 	  public void draw() {

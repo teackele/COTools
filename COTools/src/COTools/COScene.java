@@ -1,5 +1,8 @@
+package COTools;
 
 import processing.core.*;
+import java.util.Hashtable;
+import oklaGeneral.*;
 
  abstract public class COScene extends PApplet {
 	/**
@@ -8,6 +11,11 @@ import processing.core.*;
 	private static final long serialVersionUID = 1L;
 	protected COStageManager stageManager;
 	public long maxRunTime = 0;
+//	public Hashtable<String, Object> components;
+	
+	public OklaAudioPlayer oklaAudio;
+	public OklaTTS oklaTTS;
+	public OklaCam oklaCam;
 
 	/*
 	 * 

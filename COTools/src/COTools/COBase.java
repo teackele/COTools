@@ -1,3 +1,4 @@
+package COTools;
 
 public class COBase {
 	public Object parent;

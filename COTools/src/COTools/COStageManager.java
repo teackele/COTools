@@ -1,3 +1,4 @@
+package COTools;
 import java.awt.BorderLayout;
 import java.awt.DisplayMode;
 import java.awt.Frame;
@@ -6,6 +7,11 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
+import processing.core.PApplet;
+
+import oklaGeneral.*;
+
+import java.util.Hashtable;
 
 public class COStageManager extends COBase {
 	// scene management stuff
@@ -18,6 +24,8 @@ public class COStageManager extends COBase {
 	protected Thread sceneThread;
 	
 	protected long sceneStarted;
+	
+	protected Hashtable<String, Object> components;
 	
 
 	// who's the boss
@@ -46,6 +54,11 @@ public class COStageManager extends COBase {
 
 	Frame stage;
 
+	// Host PApplet for processing coomponents that need PApplet functionality
+	COHost host;
+	
+	// componenten
+	//OklaAudioPlayer oklaAudio;
 	
 	/*
 	 * Constructor
@@ -55,7 +68,6 @@ public class COStageManager extends COBase {
 	COStageManager() {
 		this._scenes = new ArrayList<String>();
 		this.data = new CODataStore();
-
 		
 		// gekpieerde uit PApplet embed voorbeeld en runsketch
 		if (platform == processing.core.PConstants.MACOSX) {
@@ -82,13 +94,35 @@ public class COStageManager extends COBase {
         
 	    this.stage.setLayout(null); 
 	    this.stage.invalidate();
+	    
+//	    host = new COScene();
+		//Class<?> c = Thread.currentThread().getContextClassLoader().loadClass("COScene");
+		host =  new COHost();
+		host.init();
+		
+		components = new Hashtable<String, Object>();
+		
+		OklaAudioPlayer oklaAudio = new OklaAudioPlayer(host);
+		components.put("oklaAudio", oklaAudio);
+		
+		OklaTTS oklaTTS = new OklaTTS(0);
+		components.put("oklaTTS", oklaTTS);
+		
+		//fixme, cam wants to capture to papplet... host is the wrong applet
+		OklaCam oklaCam = new OklaCam(host,0);
+		components.put("oklaCam", oklaCam);
 
 
 
 	}
 
 	public void dispose() {
+		host.dispose();
+//		OklaAudioPlayer oklaAudio = (OklaAudioPlayer) components.get("oklaAudio");
+//		components.put("oklaAudio", oklaAudio);
+		
 		// TODO Auto-generated method stub
+		
 		
 	}
 	
@@ -182,7 +216,12 @@ public class COStageManager extends COBase {
 		// TODO fetch data items as set in scene
 		
 		newScene.stageManager = this;
-		newScene.frame = this.stage;
+		newScene.frame = this.stage;	
+		
+		newScene.oklaAudio = (OklaAudioPlayer) components.get("oklaAudio");
+		newScene.oklaTTS = (OklaTTS) components.get("oklaTTS");
+		newScene.oklaCam = (OklaCam) components.get("oklaCam");
+		host.currentScene = newScene;
 		
 		return newScene;		
 		

@@ -1,3 +1,5 @@
+import COTools.COScene;
+
 
 public class WachtOpBezoeker extends COScene {
 	
